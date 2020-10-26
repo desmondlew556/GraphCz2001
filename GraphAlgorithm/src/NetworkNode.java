@@ -1,56 +1,43 @@
-
+import java.util.ArrayList;
+import java.util.LinkedList;
 public class NetworkNode {
-	//value of the node
-	private int nodeNum;
-	//stores address of node which is incident to it.
-	private Node next = null;
-	//stores address of last node
-	private Node current = null;
-	//data on nearest hospital and distance to hospital
-	//nearestHos[0] is the node of the nearest hospital, nearestHos[1] is the distance to the nearest hospital
-	private int[] nearestHos=new int[2];
+	//value of the node. If node is invalid, value=-1
+	private int value;
+	//stores address of linked list.
+	private LinkedList<Node> ll=new LinkedList<Node>();
 	//if node is a hospital, then hospital=true
-	private boolean hospital=false;
-	
-	public NetworkNode(int nodeNum) {
-		this.nodeNum = nodeNum;
-		next = null;
-		current = null;
-		nearestHos[0]=-1;
-		nearestHos[1]=-1;
+	private boolean hospital;
+	public NetworkNode() {
+		value = -1;
+		ll = null;
 		hospital=false;
 	}
-	public void SetHospital() {
+	public NetworkNode(int val) {
+		value = val;
+		ll = new LinkedList<Node>();
+		hospital=false;
+	}
+	public void setHospital() {
 		hospital = true;
-		nearestHos[0]=nodeNum;
-		nearestHos[1]=0;
+	}
+	public void addEdge(Node nextNode) {
+		if(ll.size()==0) {
+			ll.addFirst(nextNode);
+		}
+		else {
+			//Update the last node in linked list before adding new node
+			ll.getLast().setNext(nextNode);
+			ll.addLast(nextNode);
+		}
+	}
+	public LinkedList<Node> getEdges() {
+		return ll;
+	}
+	public int getValue() {
+		return value;
 	}
 	public boolean isHospital() {
 		return hospital;
 	}
-	public void addNode(Node nextNode) {
-		if(next==null) {
-			next = nextNode;
-			current = nextNode;
-		}
-		else {
-			//Update the last node in linked list before adding new node
-			current.setNextNode(nextNode);
-			current = nextNode;
-		}
-		
-	}
-	public Node getNextNode() {
-		return next;
-	}
-	public int getNodeNum() {
-		return nodeNum;
-	}
-	public void setNearestHospital(int nodeNum, int dist) {
-		nearestHos[0] = nodeNum;
-		nearestHos[1] = dist;
-	}
-	public int[] getNearestHospital() {
-		return nearestHos;
-	}
+	//checks if the node is visited
 }

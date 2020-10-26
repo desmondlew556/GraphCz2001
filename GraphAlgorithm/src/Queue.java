@@ -1,36 +1,30 @@
-
+import java.util.LinkedList;
 public class Queue {
-	private pathNode head;
-	private pathNode tail;
+	private LinkedList<NetworkNode> ll;
 	public Queue() {
-		head = null;
-		tail = null;
+		ll=new LinkedList<NetworkNode>();
 	}
-	public Queue(pathNode head) {
-		this.head = head;
-		tail = head;
+	public Queue(NetworkNode head) {
+		ll=new LinkedList<NetworkNode>();
+		ll.add(head);
 	}
-	public void addNode(pathNode nextNode) {
-		if(tail==null) {
-			head = nextNode;
-			tail = nextNode;
-		}
-		else {
-			tail.setNextNode(nextNode);
-			tail = nextNode;
-		}
+	public void enqueue(NetworkNode nextNode) {
+		ll.addLast(nextNode);
 	}
-	public pathNode getNode() {
-		pathNode temp = head;
-		if(head!=null) {
-			head = head.getNextNode();
+	public NetworkNode dequeue() {
+		NetworkNode temp;
+		if(ll.size()!=0) {
+			temp = ll.getFirst();
+			ll.removeFirst();
 		}
+		else
+			temp=null;
 		return temp;
 	}
-	public boolean headNotNull() {
-		if(head==null)
-			return false;
-		else
+	public boolean isEmpty() {
+		if(ll.size()==0)
 			return true;
+		else
+			return false;
 	}
 }
