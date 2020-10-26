@@ -1,147 +1,128 @@
 import java.util.ArrayList;
-
+import java.util.LinkedList;
 public class AlgorithmVer2 {
-	private static ArrayList<Node> pathToHospital = new ArrayList<Node>();
+	//create BFS tree
+	private ArrayList<Node> HospitalPath = new ArrayList<Node>();
+	private ArrayList<Node> HospitalsFound = new ArrayList<Node>();
 	
-	public static int[] generateHospitalArray() {
-		int[] hospitals = new int[H];
-		return hospitals;
-	}
-	public static NetworkNodeVer2[] generateNetwork(int[] hospital_array) {
-		//read file input and created a linked list array
-		
-		int i;
-		//linked list array of M linked lists, one for each node
-		NetworkNodeVer2[] network = new NetworkNodeVer2[M];
-		//index to use for getting node value
-		int nodeValue;
-		//Preprocessing
-		//Read file, initialise node and add edge information
-		Readfile {
-			if(network[nodeValue]==null)
-				network[nodeValue] = new NetworkNodeVer2(nodeValue);
-			//if a node is incident to another node, store the former node value in linked list of latter node.
-			Node node = new Node(incidentNodeValue);
-			network[nodeValue].addNode(node);
+	//Find nearest hospitals from a node
+	//parameters include graph, index of start node, and number of nearest hospitals to find.
+	public NetworkNodeVer2[] searchNearestHospitals(NetworkNodeVer2[] network,int startNode,int numHospital) {
+		//initialise variables
+		int i=startNode;
+		int dist = 0;
+		NetworkNodeVer2 current;
+		LinkedList<Node> linkedlist;
+		//Search start node and add to list of visited nodes
+		current=network[i];
+		//Every time a network node is visited, 3 things are done:
+		//1. set distance to indicate that node is visited
+		current.setDist(dist);
+		//2. Set the predecessor node
+		current.setPredecessor(null);
+		//3. check if first node is a hospital
+		if((current.isHospital()==true)) {
+			HospitalsFound.add(new Node(current.getValue()));
+			//decrement number of hospitals to find by 1
+			numHospital--;
+			//if all hospitals required are found, exit.
+			if(numHospital==0)
+				return network;
 		}
-		
-		
-		//get all hospital nodes
-		int[] hospitals = new int[H];
-		hospitals = hospital_array;
-		//update if a node is a hospital in the networks node
-		for(i=0;i<hospitals.length;i++) {
-			//assume hospital array store node location
-			network[hospitals[i]].SetHospital();
-		}
+		//increment distance
+		dist++;
+		//store nodes to check in a queue
+		Queue NodesQueue = new Queue(current);
+		//if queue is not empty, continue checking if that node is connected to a hospital
+		while(!(NodesQueue.isEmpty())) {
+			//get first node in queue
+			current=NodesQueue.dequeue();
+			System.out.println(current.getValue());
+			//get linkedlist to that node, in order  to find edges
+			linkedlist=current.getEdges();
+			//initialise variables 
+			//incidentNode are the nodes incident to the current node. Get first incident node.
+			NetworkNodeVer2 incidentNode;
+			//initialise loop control
+			int j=0;
+			//Check through all elements in linked list
+			while(j<linkedlist.size()) {
+				incidentNode = network[linkedlist.get(j).getValue()];
+				System.out.println("edge"+incidentNode.getValue());
+				//Visit the node only if it is not visited. That is, dist=-1.
+				if(incidentNode.getDist()==-1) {
+					//1. set distance to indicate that node is visited
+					incidentNode.setDist(dist);
+					//2. Set the predecessor node
+					incidentNode.setPredecessor(current);
+					//3. check if first node is a hospital
+					if((incidentNode.isHospital()==true)) {
+						HospitalsFound.add(new Node(incidentNode.getValue()));
+						//decrement number of hospitals to find by 1
+						numHospital--;
+						//if all hospitals required are found, exit.
+						if(numHospital==0)
+							return network;
+					}
+					//add the checked node to the NodesQueue
+					NodesQueue.enqueue(incidentNode);
+					j++;
+				}
+			}
+			//Search nodes at next depth
+			dist++;
+		}	
+		System.out.printf("Cannot find last %d hospitals\n",numHospital);
 		return network;
 	}
-	public static void searchNearestHospitals(NetworkNodeVer2[] network,int numHospitals) {
-		int i;
-		//for each node in network, find nearest hospital
-		for(i=0;i<network.length;i++) {
-			//Set the number of hospitals to find
-			int numHos = numHospitals;
-			int dist = 1;
-			if(network[i].isHospital()==true) {
-				pathToHospital.add(new Node(network[i].getNodeNum()));
-				numHos--;
+	public void printPaths(NetworkNodeVer2[] network) {
+        //Creates visited nodes and stores them in HospitalPath
+        //For traversing HospitalPath
+        int j=0;
+        int i;
+		for(i=0;i<HospitalsFound.size();i++) {
+			int dist=0;
+            //BFSNode is the nodes in the HospitalPath
+            //cur traverses the graph to find the predecessors
+            Node BFSNode = HospitalsFound.get(i);
+            NetworkNodeVer2 cur = network[BFSNode.getValue()];
+			while(cur.getPredecessor()!=null) {
+                cur=cur.getPredecessor();
+				HospitalPath.add(new Node(cur.getValue(),BFSNode));
+				BFSNode = HospitalPath.get(j);
+                j++;
+				dist++;
 			}
-			else {
-				//Create a linked list for path to hospital and store the starting node as the first node
-				pathNode parentNode = new pathNode(network[i].getNodeNum(),null);
-				//store nodes to check in a queue
-				Queue NodesQueue = new Queue(parentNode);
-				//if queue is not empty, continue checking if that node is connected to a hospital
-				while(NodesQueue.headNotNull()) {
-					//get the first node in queue
-					pathNode networknode = NodesQueue.getNode();
-					//get node number in order to get linked list of incident nodes
-					int nodeIndex = networknode.getNodeNum();
-					//Current iterates through the incident nodes of the parent node. Check the first node in the linked list first.
-					Node current = network[nodeIndex].getNextNode();
-					while(current!=null) {
-						//create the child node and link to the previous node to store path information
-						pathNode childNode = new pathNode(current.getNodeNum(),networknode);
-						//check if the node is a hospital
-						if(network[current.getNodeNum()].isHospital()==true) {
-							//if hospital is found, add the path into the list of paths
-							addPath(childNode);
-							//add to node in linked list
-							network[i].setNearestHospital(current.getNodeNum(), dist);
-							numHos--;
-							//stop searching when desired number of nearest hospitals found
-							if(numHos==0)
-								break;
-						}
-						//add the checked node to the NodesQueue
-						NodesQueue.addNode(childNode);
-						//get the next incident node
-						current = current.getNextNode();
-					}
-					//If desired number of nearest hospitals are found, move onto the next node in network.
-					if(numHos==0)
-						break;
-					//search nodes that are 1 edge further
-					dist++;
-					//parent node
-				}
-
-				
+			System.out.printf("Path %d with distance %d:\n",i+1,dist);
+			while(BFSNode!=null) {
+				System.out.printf("%d->",BFSNode.getValue());
+				BFSNode=BFSNode.getNext();
 			}
-				
-		}
-	}
-	public static void addPath(pathNode lastNode) {
-		pathNode current = lastNode;
-		//get the first node in the path
-		while(current.getPrevNode()!=null) {
-			current = current.getPrevNode();
-		}
-		
-		//create a new linked list and add to the list of pathToHospitals
-		Node firstNode = new Node(current.getNodeNum());
-		//temp node to add nodes to new linked list
-		Node curNode = firstNode;
-		while(current.getNextNode()!=null) {
-			current=current.getNextNode();
-			Node nextNode = new Node(current.getNodeNum());
-			curNode.setNextNode(nextNode);
-			curNode = nextNode;
-		}
-		pathToHospital.add(firstNode);
-	}
-	public static void printPaths() {
-		int i;
-		for(i=0;i<pathToHospital.size();i++) {
-			Node cur = pathToHospital.get(i);
-			while(cur!=null) {
-				System.out.printf("%d->",cur.getNodeNum());
-			}
-			System.out.print("end\n");
+			System.out.print("end");
+			System.out.println();
 		}
 	}
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		NetworkNodeVer2[] network = new NetworkNodeVer2[6];
-		network[0] = new NetworkNodeVer2(0);
-		network[1] = new NetworkNodeVer2(1);
-		network[2] = new NetworkNodeVer2(2);
-		network[3] = new NetworkNodeVer2(3);
-		network[4] = new NetworkNodeVer2(4);
-		network[5] = new NetworkNodeVer2(5);
+		network[0]=new NetworkNodeVer2(0);
+		network[1]=new NetworkNodeVer2(1);
+		network[2]=new NetworkNodeVer2(2);
+		network[3]=new NetworkNodeVer2(3);
+		network[4]=new NetworkNodeVer2(4);
+		network[5]=new NetworkNodeVer2(5);
 
-		network[0].addNode(new Node(1));
-		network[0].addNode(new Node(2));
-		network[1].addNode(new Node(3));
-		network[1].addNode(new Node(4));
-		network[1].addNode(new Node(5));
+		network[0].addEdge(new Node(1));
+		network[0].addEdge(new Node(2));
+		network[1].addEdge(new Node(3));
+		network[1].addEdge(new Node(4));
+		network[1].addEdge(new Node(5));
 		
 		network[1].SetHospital();
 		network[2].SetHospital();
 		network[5].SetHospital();
-		
-		searchNearestHospitals(network,2);
-		printPaths();
+		AlgorithmVer2 search=new AlgorithmVer2();
+		search.searchNearestHospitals(network,0,5);
+		search.printPaths(network);
 	}
 }

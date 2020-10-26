@@ -1,18 +1,22 @@
 
 public class Node {
-	private int NodeNum;
+	private int value;
 	private Node next;
 	public Node(int num) {
-		NodeNum = num;
-		next = null;
+		value=num;
+		next=null;
 	}
-	public void setNextNode(Node nextNode) {
-		next = nextNode;
+	public Node(int num, Node nextNode) {
+		value=num;
+		next=nextNode;
 	}
-	public int getNodeNum() {
-		return NodeNum;
+	public int getValue() {
+		return value;
 	}
-	public Node getNextNode() {
+	public Node getNext() {
 		return next;
+	}
+	public void setNext(Node next) {
+		this.next = next;
 	}
 }
