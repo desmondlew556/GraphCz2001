@@ -1,10 +1,9 @@
-//reference.https://www.khanacademy.org/computing/computer-science/algorithms/breadth-first-search/pc/challenge-implement-breadth-first-search
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Scanner;
-public class SrchAlgorithm {
+public class SrchAlgorithmPartA_B {
 	//create BFS tree
 	private static ArrayList<Node> HospitalPath = new ArrayList<Node>();
 	private static ArrayList<Node> HospitalsFound = new ArrayList<Node>();
@@ -35,13 +34,13 @@ public class SrchAlgorithm {
 		//Start node has no predecessor
 		//3. check if first node is a hospital
 		if((current.isHospital()==true)) {
-			//if hospital not in list of hospitals found, add to the list
-			HospitalsFound.add(new Node(current.getValue()));
-			//decrement number of hospitals to find by 1
-			numHospital--;
 			//if all hospitals required are found, exit.
-			if(numHospital==0)
-				return;
+			if(numHospital!=0) {
+				//if hospital not in list of hospitals found, add to the list
+				HospitalsFound.add(new Node(current.getValue()));
+				//decrement number of hospitals to find by 1
+				numHospital--;
+			}
 		}
 		//store nodes to check in a queue
 		Queue NodesQueue = new Queue(current);
@@ -80,13 +79,13 @@ public class SrchAlgorithm {
 					//3. Add to list of hospitals found if it was not previously visited.
 					//loop through list of hospitals found to check if current hospital is already found
 					if(incidentNode.isHospital()) {
-						HospitalsFound.add(new Node(nodeIndex));
-						//decrement number of hospitals to find by 1
-						numHospital--;
-						//if all hospitals required are found, exit.
-						if(numHospital==0)
-							return;
+						if(numHospital!=0) {
+							//if all hospitals required are found, exit.
+							HospitalsFound.add(new Node(nodeIndex));
+							//decrement number of hospitals to find by 1
+							numHospital--;
 						}
+					}
 
 						//add the checked node to the NodesQueue
 						NodesQueue.enqueue(incidentNode);
@@ -108,19 +107,22 @@ public class SrchAlgorithm {
 							}
 							//if hospital not in list of hospitals found, add to the list
 							if(alreadyPresent==false) {
-								HospitalsFound.add(new Node(nodeIndex));
+
 								//decrement number of hospitals to find by 1
-								numHospital--;
+								
 								//if all hospitals required are found, exit.
-								if(numHospital==0)
-									return;
+								if(numHospital!=0) {
+									HospitalsFound.add(new Node(nodeIndex));
+									numHospital--;
+								}
 							}
 					}
 				}
 				j++;
 			}
 		}	
-		System.out.printf("Cannot find last %d hospitals\n",numHospital);
+		if(numHospital>0)
+			System.out.printf("Cannot find last %d hospitals\n",numHospital);
 		return;
 	}
 	public static void printPaths(NetworkNode[] network, NodeInfo[] BFSInfo) {
@@ -167,11 +169,6 @@ public class SrchAlgorithm {
 				getPath(BFSInfo,HospitalPath.get(nodeIndex-1));
 			}
 		}
-	}
-	public static void printDist_Hospital(NodeInfo[] BFSInfo) {
-		int i;
-		for(i=0;i<HospitalsFound.size();i++)
-			System.out.printf("To hospital %d, %d units away\n",HospitalsFound.get(i).getValue(),BFSInfo[HospitalsFound.get(i).getValue()].getDist());
 	}
 	public static void clearSearch() {
 		HospitalPath.clear();
@@ -222,8 +219,7 @@ public class SrchAlgorithm {
 		
 			System.out.printf("Node %d\n",startNode);
 			searchNearestHospitals(network, BFSInfo, startNode,numHospitals);
-			printDist_Hospital(BFSInfo);
-			//printPaths(network, BFSInfo);
+			printPaths(network, BFSInfo);
 			clearSearch();
 			System.out.println();
 			resetBFSInfo(BFSInfo,size);
@@ -270,8 +266,7 @@ public class SrchAlgorithm {
 			for(i=0;i<size;i++) {
 				System.out.printf("Node %d\n",i);
 				searchNearestHospitals(network, BFSInfo,i,numHospitals);
-				printDist_Hospital(BFSInfo);
-				//printPaths(network, BFSInfo);
+				printPaths(network, BFSInfo);
 				clearSearch();
 				System.out.println();
 				resetBFSInfo(BFSInfo,size);
@@ -371,8 +366,6 @@ public class SrchAlgorithm {
 		for(i=0;i<size;i++) {
 			System.out.printf("Node %d\n",i);
 			searchNearestHospitals(network,BFSInfo,i,3);
-			printDist_Hospital(BFSInfo);
-			System.out.println();
 			printPaths(network,BFSInfo);
 			
 			clearSearch();

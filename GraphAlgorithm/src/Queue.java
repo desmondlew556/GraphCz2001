@@ -27,4 +27,10 @@ public class Queue {
 		else
 			return false;
 	}
+	public int checkValueOfNext() {
+		if(ll.size()!=0)
+			return ll.getFirst().getValue();
+		else
+			return Integer.MAX_VALUE;
+	}
 }
