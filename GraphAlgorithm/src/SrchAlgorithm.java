@@ -1,5 +1,3 @@
-package GraphAlgorithm;
-
 //reference.https://www.khanacademy.org/computing/computer-science/algorithms/breadth-first-search/pc/challenge-implement-breadth-first-search
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -403,7 +401,6 @@ public class SrchAlgorithm {
 		network[4]=new NetworkNode(4);
 		network[5]=new NetworkNode(5);
 		network[6]=new NetworkNode(6);
-
 		network[0].addEdge(new Node(1));
 		network[0].addEdge(new Node(2));
 		network[1].addEdge(new Node(3));
