@@ -1,9 +1,5 @@
-package GraphAlgorithm;
-
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Scanner;
@@ -129,12 +125,11 @@ public class SrchAlgorithmPartA_B {
 			System.out.printf("Cannot find last %d hospitals\n",numHospital);
 		return;
 	}
-	public static String printPaths(NetworkNode[] network, NodeInfo[] BFSInfo) {
+	public static void printPaths(NetworkNode[] network, NodeInfo[] BFSInfo) {
         //Creates visited nodes and stores them in HospitalPath
         //For traversing HospitalPath
         int j=0;
         int i;
-        String toAdd="";
 		for(i=0;i<HospitalsFound.size();i++) {
 			int dist=0;
             //BFSNode is the nodes in the HospitalPath
@@ -148,21 +143,20 @@ public class SrchAlgorithmPartA_B {
     			BFSNode = startNodes.get(j);
     			while(BFSNode!=null) {
     				System.out.printf("%d->",BFSNode.getValue());
-    				toAdd+=String.valueOf(BFSNode.getValue()+"->");
     				BFSNode=BFSNode.getNext();
     				dist++;
     			}
     			System.out.print("end");
     			System.out.println();
-    			toAdd+="end\n";
     			System.out.printf("To hospital %d with distance %d.\n", temp.getValue(),dist);
-    			toAdd+="To hospital "+String.valueOf(temp.getValue())+" with distance "+String.valueOf(dist)+".\n";
+    			
     		}
+    		//clear up to reduce space usage
     		startNodes.clear();
     		HospitalPath.clear();
 		}
-		return toAdd;
 	}
+	//If there are multiple shortest path to a hospital, then get all.
 	public static void getPath(NodeInfo[] BFSInfo,Node node) {
 		//if the node has no predecessor, it is the start node.
 		ArrayList<Integer> prev_list = BFSInfo[node.getValue()].getPredecessor();
@@ -177,6 +171,46 @@ public class SrchAlgorithmPartA_B {
 				getPath(BFSInfo,HospitalPath.get(nodeIndex-1));
 			}
 		}
+	}
+	//If there are multiple shortest path to a hospital, then get one of the shortest path.
+	public static void printOnePath(NetworkNode[] network, NodeInfo[] BFSInfo) {
+		int i;
+		for(i=0;i<HospitalsFound.size();i++) {
+			int dist=0;
+            //current Node
+            Node cur = HospitalsFound.get(i);
+            Node temp = HospitalsFound.get(i);
+    		//BFS Node
+            NodeInfo BFSNode = BFSInfo[cur.getValue()];
+            int j=0;
+          //if the node has no predecessor, it is the start node.
+    		while(BFSNode.getPredecessor().size()!=0) {
+    			//create new node with value of first predecessor and link to next node in path
+    			HospitalPath.add(new Node(BFSNode.getPredecessor().get(0),cur));
+    			cur= HospitalPath.get(j);
+                BFSNode=BFSInfo[cur.getValue()];
+                j++;
+    		}
+    		startNodes.add(cur);
+    		
+    		for(j=0;j<startNodes.size();j++) {
+    			dist=-1;
+    			cur = startNodes.get(j);
+    			while(cur!=null) {
+    				System.out.printf("%d->",cur.getValue());
+    				cur=cur.getNext();
+    				dist++;
+    			}
+    			System.out.print("end");
+    			System.out.println();
+    			System.out.printf("To hospital %d with distance %d.\n", temp.getValue(),dist);
+    			
+    		}
+    		//clear up to reduce space usage
+    		startNodes.clear();
+    		HospitalPath.clear();
+		}
+		
 	}
 	public static void clearSearch() {
 		HospitalPath.clear();
@@ -213,10 +247,10 @@ public class SrchAlgorithmPartA_B {
 		try {
 			System.out.println("Preprocessing data");
 			int size = Preprocessing.getSizeOfGraph(file);
-			
+			System.out.println("Size obtained.");
 			NetworkNode[] network = new NetworkNode[size];
 			network = Preprocessing.generateGraph(file,size);
-			
+			System.out.println("Graph generated.");
 			
 			Preprocessing.setHospitalNodes(f2,network);
 			int i;
@@ -224,37 +258,16 @@ public class SrchAlgorithmPartA_B {
 			for(i=0;i<size;i++) {
 				BFSInfo[i]=new NodeInfo();
 			}
-			
-			System.out.println("Please input a file name for the output");
-	    	Scanner sc = new Scanner(System.in);
-	    	String inputName = sc.nextLine();
-	    	
-	        File myObj = new File(inputName);
-	        if (myObj.createNewFile()) {
-	          System.out.println("File created: " + myObj.getName());
-	        } else {
-	          System.out.println("File already exists.");
-	        }
-	        FileWriter myWriter = new FileWriter(inputName);
-	        
+		
 			System.out.printf("Node %d\n",startNode);
-			myWriter.write("Node "+String.valueOf(startNode)+"\n");
 			searchNearestHospitals(network, BFSInfo, startNode,numHospitals);
-			String toWrite="";
-			toWrite=printPaths(network, BFSInfo);
-			myWriter.write(toWrite);
+			printOnePath(network, BFSInfo);
 			clearSearch();
 			System.out.println();
 			resetBFSInfo(BFSInfo,size);
-			myWriter.close();
-			System.out.println("Successfully wrote to the file.");
 		}
 		catch(FileNotFoundException e) {
 			System.out.println("File cannot be read.");
-		}
-		catch (IOException e) {
-		        System.out.println("An error occurred.");
-		        e.printStackTrace();
 		}
 	}
 	public static void searchMethod2(int numHospitals) {
@@ -291,42 +304,19 @@ public class SrchAlgorithmPartA_B {
 			for(i=0;i<size;i++) {
 				BFSInfo[i]=new NodeInfo();
 			}
-			
-			System.out.println("Please input a file name for the output");
-	    	Scanner sc = new Scanner(System.in);
-	    	String inputName = sc.nextLine();
-	    	
-	        File myObj = new File(inputName);
-	        if (myObj.createNewFile()) {
-	          System.out.println("File created: " + myObj.getName());
-	        } else {
-	          System.out.println("File already exists.");
-	        }
-	        FileWriter myWriter = new FileWriter(inputName);
-	        String toWrite="";
 			int j;
 			for(i=0;i<size;i++) {
 				System.out.printf("Node %d\n",i);
-				myWriter.write("Node "+String.valueOf(i)+"\n");
 				searchNearestHospitals(network, BFSInfo,i,numHospitals);
-				
-				toWrite=printPaths(network, BFSInfo);
-				myWriter.write(toWrite);
+				printOnePath(network, BFSInfo);
 				clearSearch();
 				System.out.println();
 				resetBFSInfo(BFSInfo,size);
 			}
-			myWriter.close();
-			System.out.println("Successfully wrote to the file.");
 		}
 		catch(FileNotFoundException e) {
 			System.out.println("File cannot be read.");
 		}
-		catch (IOException e) {
-	        System.out.println("An error occurred.");
-	        e.printStackTrace();
-	}
-		
 	}
 	
 	public static void methodA() {
@@ -423,8 +413,8 @@ public class SrchAlgorithmPartA_B {
 			clearSearch();
 			System.out.println();
 			resetBFSInfo(BFSInfo,size);
-		}*/
-		
+		}
+		*/
 		char choice;
 		 char input_method;
 		 int i;
