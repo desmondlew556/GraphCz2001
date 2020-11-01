@@ -246,6 +246,7 @@ public class SrchAlgorithmPartA_B {
 	          System.out.println("File created: " + myObj.getName());
 	        } else {
 	          System.out.println("File already exists.");
+	          return;
 	        }
 	        FileWriter myWriter = new FileWriter(inputName);
 	        
@@ -257,7 +258,11 @@ public class SrchAlgorithmPartA_B {
 			network = Preprocessing.generateGraph(file,size);
 			System.out.println("Graph generated.");
 			
-			Preprocessing.setHospitalNodes(f2,network);
+			int numberOfHospitals = Preprocessing.setHospitalNodes(f2,network);
+			if(numberOfHospitals>size) {
+				System.out.println("Number of hospitals cannot be larger than number of nodes.");
+				return;
+			}
 			int i;
 			NodeInfo[] BFSInfo = new NodeInfo[size];
 			for(i=0;i<size;i++) {
@@ -309,16 +314,6 @@ public class SrchAlgorithmPartA_B {
 			return;
 		}
 		try {
-			int size = Preprocessing.getSizeOfGraph(file);
-			NetworkNode[] network = new NetworkNode[size];
-			network = Preprocessing.generateGraph(file,size);
-			
-			Preprocessing.setHospitalNodes(f2,network);
-			int i;
-			NodeInfo[] BFSInfo = new NodeInfo[size];
-			for(i=0;i<size;i++) {
-				BFSInfo[i]=new NodeInfo();
-			}
 			String toWrite="";
 	    	System.out.println("Please input a file name for the output");
 	    	Scanner sc = new Scanner(System.in);
@@ -328,8 +323,25 @@ public class SrchAlgorithmPartA_B {
 	          System.out.println("File created: " + myObj.getName());
 	        } else {
 	          System.out.println("File already exists.");
+	          return;
 	        }
 	        FileWriter myWriter = new FileWriter(inputName);
+			int size = Preprocessing.getSizeOfGraph(file);
+			NetworkNode[] network = new NetworkNode[size];
+			network = Preprocessing.generateGraph(file,size);
+			
+			int numberOfHospitals = Preprocessing.setHospitalNodes(f2,network);
+		
+			if(numberOfHospitals>size) {
+				System.out.println("Number of hospitals cannot be larger than number of nodes.");
+				return;
+			}
+			int i;
+			NodeInfo[] BFSInfo = new NodeInfo[size];
+			for(i=0;i<size;i++) {
+				BFSInfo[i]=new NodeInfo();
+			}
+	        
 			int j;
 			for(i=0;i<size;i++) {
 				System.out.printf("Node %d\n",i);

@@ -860,13 +860,13 @@ public class TimeComplexityAnalysis {
 	}
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		//System.out.println("For BFS with break after each hospital");
+		System.out.println("For BFS with break after each hospital");
 		analyseAlgorithmForCD();
-		//resetVariables();
-		//System.out.println();
-		//System.out.println("For BFS that search entire graph:");
-		//analyseAlgorithmForAB();
-		//testEffectOfk();
+		resetVariables();
+		System.out.println();
+		System.out.println("For BFS that search entire graph:");
+		analyseAlgorithmForAB();
+		testEffectOfk();
 		System.out.println("Done");
 	}
 

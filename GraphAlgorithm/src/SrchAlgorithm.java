@@ -182,11 +182,13 @@ public class SrchAlgorithm {
 			}
 		}
 	}
+	//demo to print out paths
 	public static void Demo_printDist_Hospital(NodeInfo[] BFSInfo) {
 		int i;
 		for(i=0;i<HospitalsFound.size();i++)
 			System.out.printf("To hospital %d, %d units away\n",HospitalsFound.get(i).getValue(),BFSInfo[HospitalsFound.get(i).getValue()].getDist());
 	}
+	//return output to write to file
 	public static String printDist_Hospital(NodeInfo[] BFSInfo) {
 		int i;
 		String toWrite="";
@@ -233,20 +235,6 @@ public class SrchAlgorithm {
 			return;
 		}
 		try {
-			System.out.println("Preprocessing data");
-			int size = Preprocessing.getSizeOfGraph(file);
-			System.out.println("Size obtained.");
-			NetworkNode[] network = new NetworkNode[size];
-			network = Preprocessing.generateGraph(file,size);
-			System.out.println("Graph generated.");
-			int numHospitalNodes;
-			numHospitalNodes=Preprocessing.setHospitalNodes(f2,network);
-			int i;
-			NodeInfo[] BFSInfo = new NodeInfo[size];
-			for(i=0;i<size;i++) {
-				BFSInfo[i]=new NodeInfo();
-			}
-		
 			//Copy output to file
 			System.out.println("Please input a file name for the output");
 	    	Scanner sc = new Scanner(System.in);
@@ -260,6 +248,25 @@ public class SrchAlgorithm {
 	          return;
 	        }
 	        FileWriter myWriter = new FileWriter(inputName);
+			System.out.println("Preprocessing data");
+			int size = Preprocessing.getSizeOfGraph(file);
+			System.out.println("Size obtained.");
+			NetworkNode[] network = new NetworkNode[size];
+			network = Preprocessing.generateGraph(file,size);
+			System.out.println("Graph generated.");
+			int numHospitalNodes;
+			numHospitalNodes=Preprocessing.setHospitalNodes(f2,network);
+			if(numHospitalNodes>size) {
+				System.out.println("Number of hospitals cannot be larger than number of nodes.");
+				return;
+			}
+			int i;
+			NodeInfo[] BFSInfo = new NodeInfo[size];
+			for(i=0;i<size;i++) {
+				BFSInfo[i]=new NodeInfo();
+			}
+		
+			
 	        
 			System.out.printf("Node %d\n",startNode);
 			myWriter.write("Node "+String.valueOf(startNode)+"\n");
@@ -332,6 +339,10 @@ public class SrchAlgorithm {
 			network = Preprocessing.generateGraph(file,size);
 			int numHospitalNodes;
 			numHospitalNodes=Preprocessing.setHospitalNodes(f2,network);
+			if(numHospitalNodes>size) {
+				System.out.println("Number of hospitals cannot be larger than number of nodes.");
+				return;
+			}
 			int i;
 			NodeInfo[] BFSInfo = new NodeInfo[size];
 			for(i=0;i<size;i++) {

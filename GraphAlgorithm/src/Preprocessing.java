@@ -13,16 +13,19 @@ public class Preprocessing {
 		try (Scanner sc1 = new Scanner(f1)) {
 		}
 	}
-    public static void setHospitalNodes(File f1, NetworkNode[] graph) throws FileNotFoundException {
+    public static int setHospitalNodes(File f1, NetworkNode[] graph) throws FileNotFoundException {
 		boolean first=true;
 		try (Scanner sc1 = new Scanner(f1)) {
 			int size=0;
+			//no hospitals if numHospitals is not updated.
+			int numberOfHospitals=0;
 				 while (sc1.hasNextLine()) {
 					 try {
 						 String line = sc1.nextLine();
 	                     if(first==true) {
 	                         String[] splited = line.split("\\s+");
 	                         size= Integer.parseInt(splited[1]);
+	                         numberOfHospitals=size;
 	                         first=false;
 	                     }
 	                     else {
@@ -34,9 +37,11 @@ public class Preprocessing {
 					 }
 		             catch(Exception e) {
 		            	 System.out.println("Try another file.");
-		            	 return;
+		            	 return -1;
 		             }
 				 }
+				 
+				 return numberOfHospitals;
 			 }
 	}
     public static int getSizeOfGraph(File f1) throws FileNotFoundException {
