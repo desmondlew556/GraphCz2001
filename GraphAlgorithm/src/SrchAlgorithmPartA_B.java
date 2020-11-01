@@ -12,15 +12,14 @@ public class SrchAlgorithmPartA_B {
 	private static ArrayList<Node> HospitalsFound = new ArrayList<Node>();
 	private static ArrayList<Node> startNodes = new ArrayList<Node>();
 	private static int nodeIndex;
-
+	protected static int numOfNodesQueued;
+	protected static int numOfEdgesTraversed;
+	
 	//Find nearest hospitals from a node
 	//parameters include graph, index of start node, and number of nearest hospitals to find.
-	public static void searchNearestHospitals(NetworkNode[] network, NodeInfo[] BFSInfo,int startNode,int numHospital) {
+	public static void searchNearestHospitals(NetworkNode[] network, NodeInfo[] BFSInfo,int startNode) {
 		//initialise variables
-		if(numHospital<=0) {
-			System.out.println("Exiting since you don't want to find any hospitals!");
-			return;
-		}
+		int numHospital = 1;
 		int i=startNode;
 		//node does not exists if value is -1
 		if(network[i].getValue()==-1)
@@ -47,6 +46,9 @@ public class SrchAlgorithmPartA_B {
 		}
 		//store nodes to check in a queue
 		Queue NodesQueue = new Queue(current);
+		numOfNodesQueued=1;
+		numOfEdgesTraversed=0;
+		
 		//if queue is not empty, continue checking if that node is connected to a hospital
 		while(!(NodesQueue.isEmpty())) {
 			//get first node in queue
@@ -79,8 +81,9 @@ public class SrchAlgorithmPartA_B {
 					BFSInfo[nodeIndex].setDist(dist);
 					//2. Set the predecessor node
 					BFSInfo[nodeIndex].addPredecessor(currentNodeIndex);
-					//3. Add to list of hospitals found if it was not previously visited.
-					//loop through list of hospitals found to check if current hospital is already found
+					//Add number of edges traversed.
+					numOfEdgesTraversed++;
+					//3. Add to list of hospitals.
 					if(incidentNode.isHospital()) {
 						if(numHospital!=0) {
 							//if all hospitals required are found, exit.
@@ -92,34 +95,15 @@ public class SrchAlgorithmPartA_B {
 
 						//add the checked node to the NodesQueue
 						NodesQueue.enqueue(incidentNode);
+						numOfNodesQueued++;
 					}
 				//if the distance is not MAX_INT, it means that the node is already visited. If two paths or more paths arrive at a node with the same path length, 
 				//then a predecessor should be added to the node again,but the node should not be queued again.  
 					else if(dist==BFSInfo[nodeIndex].getDist()) {
-						//1. set distance to indicate that node is visited
-						BFSInfo[nodeIndex].setDist(dist);
-						//2. Set the predecessor node
+						//add number of edges traversed.
+						numOfEdgesTraversed++;
+						//1. Set the predecessor node
 						BFSInfo[nodeIndex].addPredecessor(currentNodeIndex);
-						if(incidentNode.isHospital()) {
-							boolean alreadyPresent=false;
-							for(int k=0;k<HospitalsFound.size();k++) {
-								if(nodeIndex==HospitalsFound.get(k).getValue()) {
-									alreadyPresent=true;
-									break;
-								}
-							}
-							//if hospital not in list of hospitals found, add to the list
-							if(alreadyPresent==false) {
-
-								//decrement number of hospitals to find by 1
-								
-								//if all hospitals required are found, exit.
-								if(numHospital!=0) {
-									HospitalsFound.add(new Node(nodeIndex));
-									numHospital--;
-								}
-							}
-					}
 				}
 				j++;
 			}
@@ -229,7 +213,7 @@ public class SrchAlgorithmPartA_B {
 			BFSInfo[i].reset();
 		}
 	}
-	public static void searchMethod1(int startNode,int numHospitals) {
+	public static void searchMethod1(int startNode) {
 		Scanner userInput = new Scanner(System.in);
 		System.out.println("Enter file name for graph(eg roadNet-PA.txt):");
 		String filename=userInput.next();
@@ -253,6 +237,19 @@ public class SrchAlgorithmPartA_B {
 			return;
 		}
 		try {
+			//Creates file to save outputs
+	    	System.out.println("Please input a file name for the output");
+	    	Scanner sc = new Scanner(System.in);
+	    	String inputName = sc.nextLine();
+	        File myObj = new File(inputName);
+	        if (myObj.createNewFile()) {
+	          System.out.println("File created: " + myObj.getName());
+	        } else {
+	          System.out.println("File already exists.");
+	        }
+	        FileWriter myWriter = new FileWriter(inputName);
+	        
+	        //processing and search
 			System.out.println("Preprocessing data");
 			int size = Preprocessing.getSizeOfGraph(file);
 			System.out.println("Size obtained.");
@@ -266,21 +263,11 @@ public class SrchAlgorithmPartA_B {
 			for(i=0;i<size;i++) {
 				BFSInfo[i]=new NodeInfo();
 			}
-	    	System.out.println("Please input a file name for the output");
-	    	Scanner sc = new Scanner(System.in);
-	    	String inputName = sc.nextLine();
-	    	
-	        File myObj = new File(inputName);
-	        if (myObj.createNewFile()) {
-	          System.out.println("File created: " + myObj.getName());
-	        } else {
-	          System.out.println("File already exists.");
-	        }
-	        FileWriter myWriter = new FileWriter(inputName);
-		
+	        
+	      //Add output to file
 			System.out.printf("Node %d\n",startNode);
 			myWriter.write("Node "+String.valueOf(startNode)+"\n");
-			searchNearestHospitals(network, BFSInfo, startNode,numHospitals);
+			searchNearestHospitals(network, BFSInfo, startNode);
 			String toWrite="";
 			toWrite = printOnePath(network,BFSInfo);
 	        myWriter.write(toWrite);
@@ -298,7 +285,7 @@ public class SrchAlgorithmPartA_B {
 			e.printStackTrace();
       }
 	}
-	public static void searchMethod2(int numHospitals) {
+	public static void searchMethod2() {
 		Scanner userInput = new Scanner(System.in);
 		System.out.println("Enter file name for graph(eg roadNet-PA.txt):");
 		String filename=userInput.next();
@@ -347,7 +334,7 @@ public class SrchAlgorithmPartA_B {
 			for(i=0;i<size;i++) {
 				System.out.printf("Node %d\n",i);
 				myWriter.write("Node "+String.valueOf(i)+"\n");
-				searchNearestHospitals(network, BFSInfo,i,numHospitals);
+				searchNearestHospitals(network, BFSInfo,i);
 				toWrite = printOnePath(network,BFSInfo);
 				myWriter.write(toWrite);
 				clearSearch();
@@ -369,19 +356,7 @@ public class SrchAlgorithmPartA_B {
 	public static void methodA() {
 		String filename;
 		Scanner userInput = new Scanner(System.in);
-		System.out.println("How many nearest hospitals do you want to find?");
-		int numHospitals;
-		//Choose number of nearest hospitals to find
-		while(true) {
-			while(!userInput.hasNextInt()) {
-				userInput.next();
-				System.out.println("Please enter a number:");
-			}
-			numHospitals=userInput.nextInt();
-			if(numHospitals>0)
-				break;
-			System.out.println("Enter a positive whole number:");
-		}
+		System.out.println("Algorithm to find nearest hospital");
 		//Choose to find from a node or from all nodes
 		char input_method;
   	 System.out.println("Choose one of the following:");
@@ -406,12 +381,114 @@ public class SrchAlgorithmPartA_B {
   					break;
   				System.out.println("Enter a positive whole number:");
   			}
-  		 searchMethod1(startNode,numHospitals); //read files and start search
+  		 searchMethod1(startNode); //read files and start search
   	 }
   	 else {
   		 //read input sequences and run algorithm
-	    	 searchMethod2(numHospitals);
+	    	 searchMethod2();
   	 }
+	}
+	public static void methodB() {
+		String filename;
+		Scanner userInput = new Scanner(System.in);
+		
+		System.out.println("Generating random graph...");
+		System.out.println("How many nodes should the graph have?");
+		int numOfNodes;
+		//Choose number of nearest hospitals to find
+		while(true) {
+			while(!userInput.hasNextInt()) {
+				userInput.next();
+				System.out.println("Please enter a number:");
+			}
+			numOfNodes=userInput.nextInt();
+			if(numOfNodes>0)
+				break;
+			System.out.println("Enter a positive whole number:");
+		}
+		
+		System.out.println("How many hospitals should there be?");
+		int numberOfHospitals;
+		//Choose number of nearest hospitals to find
+		while(true) {
+			while(!userInput.hasNextInt()) {
+				userInput.next();
+				System.out.println("Please enter a number:");
+			}
+			numberOfHospitals=userInput.nextInt();
+			if(numberOfHospitals>0&&numberOfHospitals<=numOfNodes)
+				break;
+			System.out.printf("Enter a positive whole number between 0 and %d:\n",numOfNodes);
+		}
+		System.out.println("What fraction of edges should the graph contain (a decimal between 0 and 1 inclusive. Eg 0.3)?");
+		double percentEdges;
+		//Choose number of nearest hospitals to find
+		while(true) {
+			while(!userInput.hasNextDouble()) {
+				userInput.next();
+				System.out.println("Please enter a decimal:");
+			}
+			percentEdges=userInput.nextDouble();
+			if(percentEdges>=0&&percentEdges<=1)
+				break;
+			System.out.print("Enter a positive fraction between 0 and 1:\n");
+		}
+		NetworkNode[] graph = new NetworkNode[numOfNodes];
+		
+			
+		graph = RandomGraphGenerator.generateRandomGraph(numOfNodes, numberOfHospitals,percentEdges);
+		//exits if no graph generated
+		if(graph[0]==null) {
+			System.out.println("Exiting");
+			return;
+		}
+		
+		try {
+			//get file name to create a new file for outputs.
+	    	System.out.println("Please input a file name for the output of search");
+	    	Scanner sc = new Scanner(System.in);
+	    	String inputName = sc.nextLine();
+	        File myObj = new File(inputName);
+	        if (myObj.createNewFile()) {
+	          System.out.println("File created: " + myObj.getName());
+	        } else {
+	          System.out.println("File already exists.");
+	          return;
+	        }
+	        String toWrite="";
+	        FileWriter myWriter = new FileWriter(inputName);
+	        
+	       // initialise BFSInfo
+			int i;
+			NodeInfo[] BFSInfo = new NodeInfo[numOfNodes];
+			for(i=0;i<numOfNodes;i++) {
+				BFSInfo[i]=new NodeInfo();
+			}
+			
+			
+			int j;
+			for(i=0;i<numOfNodes;i++) {
+				System.out.printf("Node %d\n",i);
+				myWriter.write("Node "+String.valueOf(i)+"\n");
+				searchNearestHospitals(graph, BFSInfo,i);
+				toWrite = printOnePath(graph,BFSInfo);
+				myWriter.write(toWrite);
+				clearSearch();
+				System.out.println();
+				resetBFSInfo(BFSInfo,numOfNodes);
+			}
+			
+			myWriter.close();
+			System.out.println("Successfully wrote to the file.");
+		}
+		catch(FileNotFoundException e) {
+			System.out.println("File cannot be read.");
+		}
+		 catch (IOException e) {
+		        System.out.println("An error occurred.");
+		        e.printStackTrace();
+		      }
+		
 	}
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -468,8 +545,8 @@ public class SrchAlgorithmPartA_B {
 		 
 	     do {
 	    	 System.out.println("Choose one of the following:");
-	    	 System.out.println("A. Read text from file");
-	    	 System.out.println("B. Read text from input");
+	    	 System.out.println("A. Read graph from file");
+	    	 System.out.println("B. Generate random graph");
 	    	 input_method = userInput.next().charAt(0);
 	    	 while((input_method!='A')&&(input_method!='a')&&(input_method!='B')&&(input_method!='b')) {
 	    		 System.out.println("Choose either option A or B");
@@ -480,7 +557,7 @@ public class SrchAlgorithmPartA_B {
 	    	 }
 	    	 else {
 	    		 //read input sequences and run algorithm
-		    	 System.out.println("Placeholder for random graph generator");
+	    		 methodB();
 	    	 }
 		     System.out.println("Press any key to search another time. Otherwise, enter N");
 		     choice = userInput.next().charAt(0);
