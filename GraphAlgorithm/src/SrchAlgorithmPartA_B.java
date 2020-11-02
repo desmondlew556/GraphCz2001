@@ -22,6 +22,7 @@ public class SrchAlgorithmPartA_B {
 		int numHospital = 1;
 		int i=startNode;
 		//node does not exists if value is -1
+		
 		if(network[i].getValue()==-1)
 			return;
 		int dist =0;
@@ -253,7 +254,11 @@ public class SrchAlgorithmPartA_B {
 	        //processing and search
 			System.out.println("Preprocessing data");
 			int size = Preprocessing.getSizeOfGraph(file);
-			System.out.println("Size obtained.");
+			System.out.println(size);
+			if(startNode>=size) {
+				System.out.println("size of graph should be larger than start node. Exiting");
+				return;
+			}
 			NetworkNode[] network = new NetworkNode[size];
 			network = Preprocessing.generateGraph(file,size);
 			System.out.println("Graph generated.");

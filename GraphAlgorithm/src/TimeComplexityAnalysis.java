@@ -3,7 +3,7 @@
 public class TimeComplexityAnalysis {
 	//number of iterations to run
 	private static final int NUM_RANDOM_GRAPHS_PARTAB = 5;
-	private static final int NUM_RANDOM_GRAPHS_PARTCD = 10;
+	private static final int NUM_RANDOM_GRAPHS_PARTCD = 50;
 	//number of nodes in graph, N, are 100, 500, 2500
 	//number of edges in graph, M, is 10% 
 	//number of hospitals, h, is at 30% 
@@ -46,6 +46,12 @@ public class TimeComplexityAnalysis {
 	//search k-nearest hospitals, where k=5
 	private static long[] numNodesQueued_for_diff_H_K4 = {0,0,0,0,0};
 	private static long[] numEdgesTraversed_for_diff_H_K4 = {0,0,0,0,0};
+	
+	private static long[] numNodesQueued_for_diff_H_K5 = {0,0,0,0,0};
+	private static long[] numEdgesTraversed_for_diff_H_K5 = {0,0,0,0,0};
+	
+	private static long[] numNodesQueued_for_diff_H_K6 = {0,0,0,0,0};
+	private static long[] numEdgesTraversed_for_diff_H_K6 = {0,0,0,0,0};
 	
 	public static void analyseAlgorithmForCD() {
 		int i;
@@ -494,6 +500,16 @@ public class TimeComplexityAnalysis {
 			numNodesQueued_for_diff_H_K3[i]=0;
 			numEdgesTraversed_for_diff_H_K3[i]=0;
 		}
+		for(i=0;i<5;i++) {
+			numNodesQueued_for_diff_H_K4[i] = 0;
+			numEdgesTraversed_for_diff_H_K4[i] = 0;
+			
+			numNodesQueued_for_diff_H_K5[i] = 0;
+			numEdgesTraversed_for_diff_H_K5[i] = 0;
+			
+			numNodesQueued_for_diff_H_K6[i] = 0;
+			numEdgesTraversed_for_diff_H_K6[i] = 0;
+		}
 	}
 	public static void analyseAlgorithmForAB() {
 		System.out.println("Computing results for first part...");
@@ -858,6 +874,109 @@ public class TimeComplexityAnalysis {
 		System.out.print("   Number of edges traversed\n");
 		System.out.println();
 	}
+	public static void testEffectsOfkAndh(int numberOfNodes) {
+		int size=numberOfNodes; int j; int r; int i; double percentEdges;
+		NetworkNode[] graph3 = new NetworkNode[size];
+		NodeInfo[] BFSInfo3 = new NodeInfo[size];
+		for(j=0;j<size;j++) {
+			BFSInfo3[j]=new NodeInfo();
+		}
+		int k;
+		int count;
+		percentEdges=0.3;
+		double[] h_values= {0,0.1,0.2,0.4,1};
+		
+		r=0;
+		for(r=0;r<h_values.length;r++) {
+			for(i=0;i<NUM_RANDOM_GRAPHS_PARTCD;i++) {
+					graph3 = RandomGraphGenerator1.generateRandomGraph(size, (int)(size*h_values[r]),percentEdges);
+					
+					int q;
+					//nearest hospital
+					k=1;
+					
+					for(q=0;q<size;q++) {
+						SrchAlgorithm.searchNearestHospitals(graph3, BFSInfo3,q, k, (int)(size*h_values[r]));
+						numNodesQueued_for_diff_H_K4[r]+=SrchAlgorithm.numOfNodesQueued;
+						numEdgesTraversed_for_diff_H_K4[r]+=SrchAlgorithm.numOfEdgesTraversed;
+						SrchAlgorithm.clearSearch();
+						SrchAlgorithm.resetBFSInfo(BFSInfo3,size);
+						
+					}
+
+					//nearest 5 hospitals
+					k=5;
+					for(q=0;q<size;q++) {
+						SrchAlgorithm.searchNearestHospitals(graph3, BFSInfo3,q, k, (int)(size*h_values[r]));
+						numNodesQueued_for_diff_H_K5[r]+=SrchAlgorithm.numOfNodesQueued;
+						numEdgesTraversed_for_diff_H_K5[r]+=SrchAlgorithm.numOfEdgesTraversed;
+						SrchAlgorithm.clearSearch();
+						SrchAlgorithm.resetBFSInfo(BFSInfo3,size);
+					}
+
+					//nearest 25 hospitals
+					k=25;
+					for(q=0;q<size;q++) {
+						SrchAlgorithm.searchNearestHospitals(graph3, BFSInfo3,q, k, (int)(size*h_values[r]));
+						numNodesQueued_for_diff_H_K6[r]+=SrchAlgorithm.numOfNodesQueued;
+						numEdgesTraversed_for_diff_H_K6[r]+=SrchAlgorithm.numOfEdgesTraversed;
+						SrchAlgorithm.clearSearch();
+						SrchAlgorithm.resetBFSInfo(BFSInfo3,size);
+					}
+			
+			}
+
+			numNodesQueued_for_diff_H_K4[r]/=NUM_RANDOM_GRAPHS_PARTCD;
+			numEdgesTraversed_for_diff_H_K4[r]/=NUM_RANDOM_GRAPHS_PARTCD;
+			
+			numNodesQueued_for_diff_H_K5[r]/=NUM_RANDOM_GRAPHS_PARTCD;
+			numEdgesTraversed_for_diff_H_K5[r]/=NUM_RANDOM_GRAPHS_PARTCD;
+			
+			numNodesQueued_for_diff_H_K6[r]/=NUM_RANDOM_GRAPHS_PARTCD;
+			numEdgesTraversed_for_diff_H_K6[r]/=NUM_RANDOM_GRAPHS_PARTCD;
+			
+			
+		}
+		
+		int l;
+		//print results
+		
+		System.out.printf("N= %d , M=0.3*n of nodes\n",size);
+		System.out.println("h = 0%     10%     20%     40%     100%");
+		System.out.print("k=1");
+		for(l=0;l<5;l++) {
+			System.out.printf(" %d",numNodesQueued_for_diff_H_K4[l]+numEdgesTraversed_for_diff_H_K4[l]);
+		}
+		System.out.print("   Number of nodes queued and traversed\n");
+		/*for(l=0;l<5;l++) {
+			System.out.printf(" %d",numEdgesTraversed_for_diff_H_K4[l]);
+
+		}
+		System.out.print("   Number of edges traversed\n");
+		*/
+		System.out.print("k=5");
+		for(l=0;l<5;l++) {
+			System.out.printf(" %d",numNodesQueued_for_diff_H_K5[l]+numEdgesTraversed_for_diff_H_K5[l]);
+		}
+		System.out.print("   Number of nodes queued and traversed\n");
+		/*for(l=0;l<5;l++) {
+			System.out.printf(" %d",numEdgesTraversed_for_diff_H_K5[l]);
+
+		}
+		System.out.print("   Number of edges traversed\n");
+		*/
+		System.out.print("k=25");
+		for(l=0;l<5;l++) {
+			System.out.printf(" %d",numNodesQueued_for_diff_H_K6[l]+numEdgesTraversed_for_diff_H_K6[l]);
+		}
+		System.out.print("   Number of nodes queued and traversed\n");
+		/*for(l=0;l<5;l++) {
+			System.out.printf(" %d",numEdgesTraversed_for_diff_H_K6[l]);
+
+		}
+		System.out.print("   Number of edges traversed\n");*/
+		System.out.println();
+	}
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		System.out.println("For BFS with break after each hospital");
@@ -866,7 +985,15 @@ public class TimeComplexityAnalysis {
 		System.out.println();
 		System.out.println("For BFS that search entire graph:");
 		analyseAlgorithmForAB();
+		resetVariables();
 		testEffectOfk();
+		resetVariables();
+		int i;
+		int[] values = {1250,2500,5000};
+		for(i=0;i<values.length;i++) {
+			System.out.printf("computing for n=%d\n",values[i]);
+			testEffectsOfkAndh(values[i]);
+		}
 		System.out.println("Done");
 	}
 

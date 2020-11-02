@@ -23,7 +23,11 @@ public class SrchAlgorithm {
 			System.out.println("Exiting since you don't want to find any hospitals!");
 			return;
 		}
-		
+		//Debugging
+		//System.out.println(numOfNodesQueued);
+		//System.out.println(numOfEdgesTraversed);
+		numOfNodesQueued=0;
+		numOfEdgesTraversed=0;
 		//initialise variables
 		int numOfHospitalsNotVisited=numHospitalsPresent;
 		//exit search if there are no hospitals to visit.
@@ -61,14 +65,10 @@ public class SrchAlgorithm {
 			}
 		}
 		
-		
 		//store nodes to check in a queue
 		Queue NodesQueue = new Queue(current);
-		//Debugging
-		//System.out.println(numOfNodesQueued);
-		//System.out.println(numOfEdgesTraversed);
 		numOfNodesQueued=1;
-		numOfEdgesTraversed=0;
+		
 		
 		//if queue is not empty, continue checking if that node is connected to a hospital
 		while(!(NodesQueue.isEmpty())) {
@@ -250,6 +250,10 @@ public class SrchAlgorithm {
 	        FileWriter myWriter = new FileWriter(inputName);
 			System.out.println("Preprocessing data");
 			int size = Preprocessing.getSizeOfGraph(file);
+			if(startNode>=size) {
+				System.out.println("size of graph should be larger than start node. Exiting");
+				return;
+			}
 			System.out.println("Size obtained.");
 			NetworkNode[] network = new NetworkNode[size];
 			network = Preprocessing.generateGraph(file,size);

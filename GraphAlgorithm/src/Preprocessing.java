@@ -48,11 +48,16 @@ public class Preprocessing {
 		try (Scanner sc = new Scanner(f1)) {
 			 int count = 0;
              int maxValue=0;
+             int numNodes=0;
 	         while (sc.hasNextLine()) {
 	        	 try {
     	        	System.out.println(count);
  	            	String line = sc.nextLine();
  	            	String[] splited = line.split("\\s+");
+ 	            	//get the number of nodes listed
+ 	            	if (count==2) {
+ 	            		numNodes=Integer.parseInt(splited[2]);
+ 	            	}
  	            	if (count>3) {
                          if((Integer.parseInt(splited[0]))>maxValue)
                              maxValue=Integer.parseInt(splited[0]);
@@ -68,7 +73,11 @@ public class Preprocessing {
 	        }
 	         System.out.println("Size obtained.");
 	         System.out.println();
-	         return maxValue+1;
+	         System.out.println(count);
+	         if(numNodes>(maxValue+1))
+	        	 return numNodes;
+	         else
+	        	 return maxValue+1;
 		}
     }
 	public static NetworkNode[] generateGraph(File f1, int maxValue) throws FileNotFoundException {
